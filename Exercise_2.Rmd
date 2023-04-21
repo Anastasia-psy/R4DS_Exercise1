@@ -1,0 +1,62 @@
+---
+title: "Exercise 2"
+author: "Paola Galfrascoli"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 2 - Debugging techniques
+
+**Question 1: Explain why `termplot()` raises a warning message when we pass `mod2` instead of `mod1` and the steps you took / the techniques you used to tackle this problem.**  
+
+First, we run the code provided in the text to create the data of the example and we investigates the output of the `termplot()` function.
+
+```{r echo=T, results='hide'}
+set.seed(1)
+n <- 10L
+x1 <- rnorm(n)
+x2 <- seq.int(n)
+beta0 <- 0; beta1 <- 1; beta2 <- 2
+y <- beta0 + beta1 * x1 + beta2 * x2 + rnorm(n)
+
+(mod1 <- lm(y ~ x1 + x2))
+termplot(mod1, ask = FALSE, ylim = "free")
+
+(mod2 <- lm(y ~ x1 + I(1:n)))
+termplot(mod2, ask = FALSE, ylim = "free")
+```
+
+
+Then, in order to understand how the function works, we go into the debug mode. Since the `termplot()` function is defined in a base package (`stats`), we cannot use the `browser()` call directly into the function definition. Then, we use the `debug()` function that automatically sets up a `browser()` call at the beginning of the `termplot()` function. (We will not print the entire debug console output for conciseness.)
+
+```{r results='hide', fig.show='hide'}
+debug(termplot)
+termplot(mod2, ask = FALSE, ylim = "free")
+```
+
+
+In debug mode, we go through the function code using the following debug commands:  
+`n`: executes the next step in the function;  
+`s`: steps into the next function;  
+`f`: finishes execution of the current loop or function;  
+`c`: leaves interactive debugging and continues regular execution of the function;  
+`q`: stops debugging, terminates the function, and returns to the global workspace.  
+
+The warning message appears because of the following piece of code:
+```{r eval=FALSE}
+if (any(grepl(":", nmt, fixed = TRUE))) 
+        warning("'model' appears to involve interactions: see the help page", 
+            domain = NA, immediate. = TRUE)
+```
+
+The function `grepl()` identifies the symbol ":" in the object `nmt`, which is the vector of column names of the output of the `predict()` function applied to `mod2` inside `termplot()`. If there are interactions in the model, some of the column names will have the ":" in them (e.g. an interaction between `x1` and `x2` will have its corresponding column name as `x1:x2`). So, this code is intended to create a warning when there are some interactions in the model, but in our case it appears because in `mod2` the second variable is expressed as `I(1:n)`.  
+
+
+
+
+**Explain why `termplot()` creates an empty plot when displaying the relationship between `x2 := 1:n` and its predicted values.**  
+
