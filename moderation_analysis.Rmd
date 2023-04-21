@@ -1,0 +1,281 @@
+---
+title: "Narcissism Self-esteem, moderation analysis"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r include=FALSE}
+if(!require("pacman")) install.packages("pacman")
+pacman::p_load("dplyr", "mgm", "qgraph", "psych")
+
+dat<-read.csv2("data/Network_Dataset_Ramzi.csv", header=TRUE)
+
+dat$adm <- rowMeans(dat[,c(2, 3, 4, 6, 8, 9, 16, 17, 19)])
+dat$riv <- rowMeans(dat[,c(5,7,10, 11, 12, 13, 14, 15, 18)])
+dat$cni <- rowMeans(dat[,20:35])
+dat$hsns <- rowMeans(dat[,36:45])
+dat$rses <- rowMeans(dat[,46:55])
+dat$rsespos <- rowMeans(dat[,c(46, 48, 49, 52, 55)])
+dat$rsesneg <- rowMeans(6-dat[,c(47, 50, 51, 53, 54)])
+dat$rsesasmt <- rowMeans(dat[,c(48, 49, 50, 52, 54)])
+dat$rsesacpt <- rowMeans(dat[, c(46, 47, 51, 53, 55)])
+
+dat_mgm <-select(dat, hsns, riv, adm, cni, rses, rsespos, rsesneg,
+                 rsesasmt, rsesacpt, Sex)
+```
+
+# RSES as moderator
+
+In the following network, rses is allowed to be a moderator of any other relationship. Results show that rses never moderates relationships among narcissistic traits. Pie charts indicate node predictability.
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, rses, hsns:cni)
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = 1,
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
+## Subscales of rses as moderators
+
+The dimensionality of the RSES is still debated and we therefore examined two different subscales. These are, for example, assessment and acceptance and/or positive and negative self-esteem (e.g., Tafarodi & Milne, 2002). Although it is true that simply examining positively and negatively worded items may be conceived as reflecting simple method effects, some still consider the two scales as theoretically meaningful (Marsh et al., 2010).
+
+```{r include=FALSE}
+rposneg <- cor(select(dat_mgm, rsespos, rsesneg))[1,2]
+alphapos <- alpha(dat[,c(46, 48, 49, 52, 55)])$total$raw_alpha
+alphaneg <- alpha(dat[,c(47, 50, 51, 53, 54)])$total$raw_alpha
+r1 <- round(rposneg/sqrt(alphapos*alphaneg), 2)
+
+rasmtacpt <- cor(select(dat_mgm, rsesasmt, rsesacpt))[1,2]
+alphaasmt <- alpha(dat[,c(48, 49, 50, 52, 54)])$total$raw_alpha
+alphaacpt <- alpha(dat[, c(46, 47, 51, 53, 55)])$total$raw_alpha
+r2 <- round(rasmtacpt/sqrt(alphaasmt*alphaacpt), 2)
+
+r3 <- select(dat_mgm, rses, rsespos, rsesneg, rsesasmt, rsesacpt) %>% cor %>%
+  .[-1,1]
+
+
+```
+
+It is important to notice that the correlations among positive and negative self-esteem were quite large, with positive-negative self-esteem showing a disattenuated correlation of `r r1` and acceptance-assessment showing a disattenuated correlation of `r r2`. The correlations of these subscales with the total rses ranged between `r round(min(abs(r3)), 2)` and `r round(max(abs(r3)), 2)`, thus limiting their possibility to produce results very different from those of rses.
+
+## Positive and negative RSES
+
+We included positive and negative self-esteem and inspected moderations involving these traits.  We considered them in separate analyses, to avoid potential multicollinearity effects. It is noteworthy that the pattern of relationships of the two types of self-esteems was exactly the same, albeit with opposite signs. Since they occupy the same "position" in the nomological network, save for signs, our data offer no evidence in support of them being distinct traits.
+No interaction effect emerged.
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, rsespos, hsns:cni)
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = 1,
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, rsesneg, hsns:cni)
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = 1,
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
+# Positive and negative RSES - together in the same model
+
+In this case, we see an obvious negative edge between positive and negative self-esteem. Furthermore, they have some slightly different relationships with narcissistic traits, but neither of them appears to be a significant moderation.
+No interaction effect emerged.
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, rsespos, rsesneg, hsns:cni)
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = c(1, 2),
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
+
+## Rses divided as assessment and acceptance - two graphs
+
+Here there is only one slight difference between the two RSES-subscales, only assessment has a negative relationship with rivalry, whereas acceptance does not. The remaining pattern of relationships is the same. This is not very informative, since a missing relationship can be simply due to a little bit sampling error, with one of the relationships being slightly "above threshold" and the other slightly below.
+No interaction effect emerged.
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, rsesasmt, hsns:cni)
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = 1,
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, rsesacpt, hsns:cni)
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = 1,
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
+
+
+
+# Rses divided as assessment and acceptance - one graph
+
+Assessment seems to be the only one connected to narcissism, but this is likely because the high multicollinearity with acceptance.
+No interaction effect emerged.
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, rsesasmt, rsesacpt, hsns:cni)
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = c(1, 2),
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
+## Gender as a moderator
+
+In this case, gender is allowed to be a moderator, same way we did for self-esteem.
+
+* Notice that we only kept gender = 1 (female) or 2 (male), removing six individuals who did not qualify as male or female.
+* For simplicity, we considered gender as as if it was a continuous predictor. Results are the same, but we can see the signs of its relationships with other variables: The positive relationship indicates that males report more rivalry.
+
+Also in this case, no interaction emerged.
+
+```{r echo=FALSE}
+dtnet <- select(dat_mgm, Sex, hsns:cni) %>% 
+  filter(Sex != 3) 
+
+fit_mgm <- mgm(data = dtnet,
+               type = c("g", "g", "g", "g", "g"),
+               levels = c(1, 1, 1, 1, 1),
+               lambdaSel = "EBIC",
+               lambdaGam = 0.25,
+               moderators = 1,
+               scale = TRUE,
+               pbar = FALSE,
+               signInfo = FALSE)
+
+pred_mgm <- predict(object = fit_mgm,
+                    data = dtnet,
+                    errorCon = c("RMSE", "R2"))
+
+FactorGraph(object = fit_mgm,
+            labels = names(dtnet),
+            PairwiseAsEdge = TRUE,
+            pie = pred_mgm$errors$R2)
+
+```
+
