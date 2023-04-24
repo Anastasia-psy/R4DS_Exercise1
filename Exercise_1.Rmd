@@ -1,0 +1,79 @@
+---
+title: "Exercise 1"
+author: "Paola Galfrascoli"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 1 - Exploratory Data Analysis
+
+```{r echo=F, results='hide'}
+library(rwhatsapp)
+covfefe_chat <- rwa_read(
+  here::here("exam", "covfefe_chat.txt"),
+  encoding = "UTF-8"
+)
+library(dplyr, warn.conflicts = FALSE)
+glimpse(covfefe_chat)
+```
+
+
+**Who sent the highest number of messages?**  
+Andrea Gilardi sent the highest number of messages: 233.  
+
+```{r}
+covfefe_chat %>%  count(author, sort = T) 
+
+```
+  
+**How many messages were exchanged during December 2022?**  
+During December 2022 were exchanged 246 messages.  
+
+```{r}
+covfefe_chat %>% 
+  mutate(Month = lubridate::month(time, label = FALSE),
+         Year = lubridate::year(time), DayMonth = format(as.Date(time), "%y-%m")) %>%
+  count(DayMonth) %>%  filter(DayMonth == '22-12')
+```
+    
+**Who sent the first message of the current year? At which time?**  
+The first message of the 2023 was sent by Andrea Gilardi at 15:08:50.  
+
+```{r}
+covfefe_chat %>% filter(time > '2022-12-31') %>%  slice(1) 
+```
+    
+**On which day did we exchange the highest number of messages? After filtering the corresponding text messages, check their content and try to explain the anomalous behaviour.**  
+The highest number of messages was exchanged on the 1st February 2023 (60 messages).
+
+```{r}
+covfefe_chat %>% 
+  mutate(YearMonthDay = format(as.Date(time), "%y-%m-%d")) %>% count(YearMonthDay, sort = T)
+```
+  
+Most of the messages of this day were exchanged to plan for an aperitif in the evening and a poll was created to count how many people were in. There were difficulties in finding a place where to have it.
+```{r}
+covfefe_chat %>% 
+  mutate(YearMonthDay = format(as.Date(time), "%y-%m-%d")) %>% 
+  filter(YearMonthDay == "23-02-01") %>% select(text)
+```
+    
+**How many messages are sent on average per day?**  
+14.5045 are sent on average per day.  
+
+```{r}
+covfefe_chat %>% 
+  mutate(YearMonthDay = format(as.Date(time), "%y-%m-%d")) %>%
+  count(YearMonthDay) %>% summarise(mean = mean(n))
+```
+    
+**Who sent the highest number of messages which included at least one emoji?**  
+Andrea Gilardi sent the highest number of messages (66) which included at least one emoji.  
+
+```{r}
+covfefe_chat %>% filter(!vapply(emoji, is.null, logical(1))) %>% count(author, sort = T)
+```
