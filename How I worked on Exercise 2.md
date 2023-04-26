@@ -1,3 +1,6 @@
+NB. TO READ AND UNDERSTAND THIS FILE IT IS NECESSARY TO LOOK AT THE CODE AND GO INTO DEBUG MODE BECAUSE THERE ARE MANY REFERENCES TO THE FUNCTION CODE
+
+
 To understand what termplot(.) plots
 -----------------------------------
 
@@ -42,19 +45,15 @@ NB. I will write how it works in our particular case (i.e. with the arguments an
 	What's happening: grepl(":", x, ...) finds out if there is any ":" in x, and 		here we have one in the column names =I(1:n)
 
 
-... I skip unimportant things such as titles and labels...
+... I skip unimportant things such as titles and labels (or options that are not used in our case)...
 
 
-7. The second problem is here: 
+7. transform.x <- vector of (FALSE, FALSE)
+8. cn = expression(x1, I(1:n))
+	I don't know what exactly is, but it comes from the following code: cn <- sstr2expression(nmt). Then, cn[[1]] = x1 and cn[[2]] = I(1:n)
+9. ylims <- range of values for the y-axis (i.e. minimum and maximum of b*X+const)
 
-xx <- carrier(cn[[i]], transform.x[i])
-      if (!is.null(use.rows)) 
-        xx <- xx[use.rows]
-      xlims <- range(xx, na.rm = TRUE)
-      if (rug) 
-        xlims[1L] <- xlims[1L] - 0.07 * diff(xlims)
-      oo <- order(xx)
-      plot(xx[oo], tms[oo, i], type = "l", xlab = xlabs[i], 
-        ylab = ylabs[i], xlim = xlims, ylim = ylims, 
-        main = main[i], col = col.term, lwd = lwd.term, 
-        ...)
+10. The second problem is here: xx <- carrier(cn[[i]], transform.x[i])
+	What's the output of the carrier() function? 
+	if i=1, length(cn[[1]])=1, and the output is eval(cn[[i]], data, ...) = x1, then xx = x1 and its values are used in the plot as x-axis
+	if i=2, length(cn[[2]])=2, then the 'term' argument of the carrier function becomes cn[[2]][[2L]], the length(cn[[2]][[2L]]) = 3 (I don't know why but I tried and is correct), then the 'term' argument of the carrier function becomes cn[[2]][[2L]][[2L]], that's equal 1. Then the length of the if condition is =1 and the output is finally xx = eval(1, ...), that's just 1.
