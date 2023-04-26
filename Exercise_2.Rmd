@@ -58,5 +58,9 @@ The function `grepl()` identifies the symbol ":" in the object `nmt`, which is t
 
 
 
-**Explain why `termplot()` creates an empty plot when displaying the relationship between `x2 := 1:n` and its predicted values.**  
+**Question 2: Explain why `termplot()` creates an empty plot when displaying the relationship between `x2 := 1:n` and its predicted values.**  
 
+When selecting the $x$-axis values for the plot, the `termplot()` function adopts a procedure that erroneously picks just the value $1$. More in detail, the function that selects the $x$-axis values is the `carrier()` function, defined inside the `termplot()` itself. Then, by using command `s` in debug mode, we step into this function and see why the code doesn't work for the variable named `I(1:n)`. This function has arguments `term` and `transform`. The second term is equal `FALSE` in our example, while the first one is taken from an object of the form `expression(x1, I(1:n))`, obtained by applying the function `str2expression()` to the column names `x1` and `I(1:n)`. Because of an `if` condition that evaluates the length of the argument `term` being greater than `1L`, the function, after some repeated steps, returns as the $x$-axis values as single number: $1$. The `xlim` argument and the $y$-axis values of the plot are also affected by this result, and the consequence is a plot similar to the output of the following code: 
+```{r}
+plot(1, -9.361879, type = "l", xlim = c(1,1), ylim = c(-9.361879,  9.361879), ylab="")
+```
