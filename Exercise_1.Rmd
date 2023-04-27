@@ -41,7 +41,7 @@ covfefe_chat %>%
 ```
     
 **Who sent the first message of the current year? At which time?**  
-The first message of the 2023 was sent by Andrea Gilardi at 15:08:50.  
+The first message of the 2023 was sent by Andrea Gilardi at 15:08:43 on 2023-01-04.  
 
 ```{r}
 covfefe_chat %>% filter(time > '2022-12-31') %>%  slice(1) 
@@ -63,12 +63,12 @@ covfefe_chat %>%
 ```
     
 **How many messages are sent on average per day?**  
-14.5045 are sent on average per day.  
+15 messages are sent on average per day.  
 
 ```{r}
 covfefe_chat %>% 
   mutate(YearMonthDay = format(as.Date(time), "%y-%m-%d")) %>%
-  count(YearMonthDay) %>% summarise(mean = mean(n))
+  count(YearMonthDay) %>% summarise(mean = mean(as.numeric(n))) %>% round()
 ```
     
 **Who sent the highest number of messages which included at least one emoji?**  
