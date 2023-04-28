@@ -360,6 +360,7 @@ Galkina, Muhammad Haroon Shaukat</h4>
 
 <div id="exercise-1---exploratory-data-analysis" class="section level2">
 <h2>Exercise 1 - Exploratory Data Analysis</h2>
+<pre><code>## Warning: package &#39;rwhatsapp&#39; was built under R version 4.2.3</code></pre>
 <p><strong>Who sent the highest number of messages?</strong><br />
 Andrea Gilardi sent the highest number of messages: 233.</p>
 <pre class="r"><code>covfefe_chat %&gt;%  count(author, sort = T) </code></pre>
@@ -376,7 +377,7 @@ Andrea Gilardi sent the highest number of messages: 233.</p>
 ##  8 Valentina Zangirolami    76
 ##  9 Roberto Ascari           72
 ## 10 Luca Danese              47
-## # ℹ 22 more rows</code></pre>
+## # … with 22 more rows</code></pre>
 <p><strong>How many messages were exchanged during December
 2022?</strong><br />
 During December 2022 were exchanged 246 messages.</p>
@@ -394,9 +395,10 @@ The first message of the 2023 was sent by Andrea Gilardi at 15:08 on
 2023-01-04.</p>
 <pre class="r"><code>covfefe_chat %&gt;% filter(time &gt; &#39;2022-12-31&#39;) %&gt;%  slice(1) </code></pre>
 <pre><code>## # A tibble: 1 × 6
-##   time                author         text                source emoji emoji_name
-##   &lt;dttm&gt;              &lt;fct&gt;          &lt;chr&gt;               &lt;chr&gt;  &lt;lis&gt; &lt;list&gt;    
-## 1 2023-01-04 15:08:37 Andrea Gilardi &quot;Hi everyone! Firs… C:/Us… &lt;chr&gt; &lt;chr [1]&gt;</code></pre>
+##   time                author         text                   source emoji emoji…¹
+##   &lt;dttm&gt;              &lt;fct&gt;          &lt;chr&gt;                  &lt;chr&gt;  &lt;lis&gt; &lt;list&gt; 
+## 1 2023-01-04 15:08:29 Andrea Gilardi &quot;Hi everyone! First o… C:/! … &lt;chr&gt; &lt;chr&gt;  
+## # … with abbreviated variable name ¹​emoji_name</code></pre>
 <p><strong>On which day did we exchange the highest number of messages?
 After filtering the corresponding text messages, check their content and
 try to explain the anomalous behaviour.</strong><br />
@@ -417,7 +419,7 @@ The highest number of messages was exchanged on the 1st February 2023
 ##  8 22-12-05        29
 ##  9 22-12-14        29
 ## 10 22-11-02        28
-## # ℹ 101 more rows</code></pre>
+## # … with 101 more rows</code></pre>
 <p>Most of the messages of this day were exchanged to plan for an
 aperitif in the evening and a poll was created to count how many people
 were in. There were difficulties in finding a place where to have
@@ -438,7 +440,7 @@ it.</p>
 ##  8 &quot;It&#39;s warm today&quot;                                
 ##  9 &quot;Seriously?\U0001f92a&quot;                           
 ## 10 &quot;Second year wants to stay warm inside\U0001f607&quot;
-## # ℹ 50 more rows</code></pre>
+## # … with 50 more rows</code></pre>
 <p><strong>How many messages are sent on average per day?</strong><br />
 15 messages are sent on average per day.</p>
 <pre class="r"><code>covfefe_chat %&gt;% 
@@ -466,7 +468,7 @@ at least one emoji.</p>
 ##  8 Muhammad Amir Saeed     9
 ##  9 Jiefeng Bi              8
 ## 10 Luca Presicce           8
-## # ℹ 13 more rows</code></pre>
+## # … with 13 more rows</code></pre>
 <p><strong>Determine the most common emoji for each author. In case of
 ties, you can select any of the equally-used emojies.</strong><br />
 See below the list of authors with their most frequently used emoji. 8
@@ -481,49 +483,37 @@ covfefe_chat%&gt;%
   group_by(author) %&gt;%
   arrange(desc(freq), .by_group = T) %&gt;%
   distinct() %&gt;%
-  slice_head() %&gt;% select(author, emoji_name, freq) %&gt;%
-  print(n=23)</code></pre>
-<pre><code>## # A tibble: 23 × 3
+  slice_head() </code></pre>
+<pre><code>## # A tibble: 23 × 4
 ## # Groups:   author [23]
-##    author                emoji_name                         freq
-##    &lt;fct&gt;                 &lt;chr&gt;                             &lt;int&gt;
-##  1 Alessandro Colombi    waving hand: light skin tone          2
-##  2 Alessia Caponera      grinning face with smiling eyes       1
-##  3 Alice Giampino        beaming face with smiling eyes        2
-##  4 Andrea Gilardi        hot beverage                         18
-##  5 Caterina Daidone      partying face                         2
-##  6 Chiara Magnani        thumbs up: light skin tone            8
-##  7 Claudia Sartirana     face with tears of joy               11
-##  8 Federico Camerlenghi  grimacing face                        3
-##  9 Federico Cortese      coffin                                1
-## 10 Francesco Barile      raised hand                           1
-## 11 Giorgia Zaccaria      hot beverage                         11
-## 12 Jiefeng Bi            check mark button                     1
-## 13 Laura D&#39;Angelo        thumbs down                           1
-## 14 Luca Aiello           smiling face with smiling eyes        3
-## 15 Luca Danese           man raising hand: light skin tone     2
-## 16 Luca Presicce         hand with fingers splayed             4
-## 17 Ludovica De Carolis   smiling face with smiling eyes        9
-## 18 Muhammad Amir Saeed   thumbs up: light skin tone            5
-## 19 Nicola Crespi         smiling face with smiling eyes        1
-## 20 Riccardo Cogo         wrapped gift                          1
-## 21 Roberto Ascari        partying face                         6
-## 22 Tommaso Rigon         slightly smiling face                10
-## 23 Valentina Zangirolami smiling face with smiling eyes        5</code></pre>
+##    author               emoji                  emoji_name                   freq
+##    &lt;fct&gt;                &lt;chr&gt;                  &lt;chr&gt;                       &lt;int&gt;
+##  1 Alessandro Colombi   &quot;\U0001f44b\U0001f3fb&quot; waving hand: light skin to…     2
+##  2 Alessia Caponera     &quot;\U0001f604&quot;           grinning face with smiling…     1
+##  3 Alice Giampino       &quot;\U0001f601&quot;           beaming face with smiling …     2
+##  4 Andrea Gilardi       &quot;☕&quot;                   hot beverage                   18
+##  5 Caterina Daidone     &quot;\U0001f973&quot;           partying face                   2
+##  6 Chiara Magnani       &quot;\U0001f44d\U0001f3fb&quot; thumbs up: light skin tone      8
+##  7 Claudia Sartirana    &quot;\U0001f602&quot;           face with tears of joy         11
+##  8 Federico Camerlenghi &quot;\U0001f62c&quot;           grimacing face                  3
+##  9 Federico Cortese     &quot;⚰️&quot;                    coffin                          1
+## 10 Francesco Barile     &quot;✋&quot;                   raised hand                     1
+## # … with 13 more rows</code></pre>
 <p><strong>Compute and display the total number of messages exchanged in
 the whatsapp chat after dividing the observations according to the hour
 of the day AND the day of the week</strong></p>
-<pre class="r"><code>library(lubridate)
-
-df_plot&lt;-covfefe_chat%&gt;%
+<pre class="r"><code>library(lubridate)</code></pre>
+<pre><code>## Warning: package &#39;lubridate&#39; was built under R version 4.2.3</code></pre>
+<pre class="r"><code>df_plot&lt;-covfefe_chat%&gt;%
   complete(time= seq.POSIXt(min(time), max(time), by=&quot;hour&quot;))%&gt;%
   group_by(Day=wday(time,label = T), Hour=hour(time))%&gt;%
     reframe(Freq_text=sum(table(text)))%&gt;%
   select(Day, Hour, Freq_text) 
 
 library(ggplot2)
-library(ggrepel)
-df_plot%&gt;%
+library(ggrepel)</code></pre>
+<pre><code>## Warning: package &#39;ggrepel&#39; was built under R version 4.2.3</code></pre>
+<pre class="r"><code>df_plot%&gt;%
 ggplot(aes(x= Hour, y=Freq_text))+
    geom_smooth(aes(color = Day),show.legend = T, stat=&quot;identity&quot;)+
    labs(x =&quot;Hour&quot; , y=&quot;Number of messages&quot; , title = &quot;Number of messages by hour and day&quot;)+

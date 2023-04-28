@@ -93,9 +93,7 @@ covfefe_chat%>%
   group_by(author) %>%
   arrange(desc(freq), .by_group = T) %>%
   distinct() %>%
-  slice_head() %>% select(author, emoji_name, freq) %>%
-  print(n=23)
-
+  slice_head() 
 ```
   
 **Compute and display the total number of messages exchanged in the whatsapp chat after dividing the observations according to the hour of the day AND the day of the week**  
