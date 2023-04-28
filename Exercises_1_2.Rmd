@@ -41,7 +41,7 @@ covfefe_chat %>%
 ```
     
 **Who sent the first message of the current year? At which time?**  
-The first message of the 2023 was sent by Andrea Gilardi at 15:08:43 on 2023-01-04.  
+The first message of the 2023 was sent by Andrea Gilardi at 15:08 on 2023-01-04.  
 
 ```{r}
 covfefe_chat %>% filter(time > '2022-12-31') %>%  slice(1) 
@@ -82,7 +82,7 @@ covfefe_chat %>% filter(!vapply(emoji, is.null, logical(1))) %>% count(author, s
 **Determine the most common emoji for each author. In case of ties, you can select any of the equally-used emojies.**  
 See below the list of authors with their most frequently used emoji. 8 authors have never used an emoji.  
 
-```{r, message=FALSE, warning=F}
+```{r}
 library(tidyr)
 
 covfefe_chat%>%
@@ -97,12 +97,31 @@ covfefe_chat%>%
   print(n=23)
 
 ```
-
-
-
   
-    
+**Compute and display the total number of messages exchanged in the whatsapp chat after dividing the observations according to the hour of the day AND the day of the week**  
 
+```{r, results=F, message=FALSE}
+library(lubridate)
+
+df_plot<-covfefe_chat%>%
+  complete(time= seq.POSIXt(min(time), max(time), by="hour"))%>%
+  group_by(Day=wday(time,label = T), Hour=hour(time))%>%
+    reframe(Freq_text=sum(table(text)))%>%
+  select(Day, Hour, Freq_text) 
+
+library(ggplot2)
+library(ggrepel)
+df_plot%>%
+ggplot(aes(x= Hour, y=Freq_text))+
+   geom_smooth(aes(color = Day),show.legend = T, stat="identity")+
+   labs(x ="Hour" , y="Number of messages" , title = "Number of messages by hour and day")+
+     theme_bw()
+``` 
+
+```{r, echo=F} 
+rm(list = ls())
+```    
+<br>
 <br>
 
 ## Exercise 2 - Debugging techniques
