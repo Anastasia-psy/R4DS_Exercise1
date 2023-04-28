@@ -77,3 +77,24 @@ Andrea Gilardi sent the highest number of messages (66) which included at least 
 ```{r}
 covfefe_chat %>% filter(!vapply(emoji, is.null, logical(1))) %>% count(author, sort = T)
 ```
+
+
+**Determine the most common emoji for each author. In case of ties, you can select any of the equally-used emojies.**  
+See below the list of authors with their most frequently used emoji. 8 authors have never used an emoji.  
+
+```{r, message=FALSE, warning=F}
+library(tidyr)
+
+covfefe_chat%>%
+  unnest(c(emoji,emoji_name))%>%
+  filter(!is.na(author)& emoji!="NULL")%>%
+  group_by(author,emoji)%>%
+  reframe(emoji,emoji_name,freq=n())%>%
+  group_by(author) %>%
+  arrange(desc(freq), .by_group = T) %>%
+  distinct() %>%
+  slice_head() %>% select(author, emoji_name, freq) %>%
+  print(n=23)
+
+```
+

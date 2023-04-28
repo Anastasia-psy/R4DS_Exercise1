@@ -11,7 +11,7 @@
 
 <meta name="author" content="Paola Galfrascoli" />
 
-<meta name="date" content="2023-04-24" />
+<meta name="date" content="2023-04-28" />
 
 <title>Exercise 1</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Exercise 1</h1>
 <h4 class="author">Paola Galfrascoli</h4>
-<h4 class="date">2023-04-24</h4>
+<h4 class="date">2023-04-28</h4>
 
 </div>
 
@@ -389,13 +389,13 @@ During December 2022 were exchanged 246 messages.</p>
 ## 1 22-12      246</code></pre>
 <p><strong>Who sent the first message of the current year? At which
 time?</strong><br />
-The first message of the 2023 was sent by Andrea Gilardi at
-15:08:50.</p>
+The first message of the 2023 was sent by Andrea Gilardi at 15:08:43 on
+2023-01-04.</p>
 <pre class="r"><code>covfefe_chat %&gt;% filter(time &gt; &#39;2022-12-31&#39;) %&gt;%  slice(1) </code></pre>
 <pre><code>## # A tibble: 1 × 6
 ##   time                author         text                source emoji emoji_name
 ##   &lt;dttm&gt;              &lt;fct&gt;          &lt;chr&gt;               &lt;chr&gt;  &lt;lis&gt; &lt;list&gt;    
-## 1 2023-01-04 15:08:53 Andrea Gilardi &quot;Hi everyone! Firs… C:/Us… &lt;chr&gt; &lt;chr [1]&gt;</code></pre>
+## 1 2023-01-04 15:08:08 Andrea Gilardi &quot;Hi everyone! Firs… C:/Us… &lt;chr&gt; &lt;chr [1]&gt;</code></pre>
 <p><strong>On which day did we exchange the highest number of messages?
 After filtering the corresponding text messages, check their content and
 try to explain the anomalous behaviour.</strong><br />
@@ -439,14 +439,14 @@ it.</p>
 ## 10 &quot;Second year wants to stay warm inside\U0001f607&quot;
 ## # ℹ 50 more rows</code></pre>
 <p><strong>How many messages are sent on average per day?</strong><br />
-14.5045 are sent on average per day.</p>
+15 messages are sent on average per day.</p>
 <pre class="r"><code>covfefe_chat %&gt;% 
   mutate(YearMonthDay = format(as.Date(time), &quot;%y-%m-%d&quot;)) %&gt;%
-  count(YearMonthDay) %&gt;% summarise(mean = mean(n))</code></pre>
+  count(YearMonthDay) %&gt;% summarise(mean = mean(as.numeric(n))) %&gt;% round()</code></pre>
 <pre><code>## # A tibble: 1 × 1
 ##    mean
 ##   &lt;dbl&gt;
-## 1  14.5</code></pre>
+## 1    15</code></pre>
 <p><strong>Who sent the highest number of messages which included at
 least one emoji?</strong><br />
 Andrea Gilardi sent the highest number of messages (66) which included
@@ -466,6 +466,49 @@ at least one emoji.</p>
 ##  9 Jiefeng Bi              8
 ## 10 Luca Presicce           8
 ## # ℹ 13 more rows</code></pre>
+<p><strong>Determine the most common emoji for each author. In case of
+ties, you can select any of the equally-used emojies.</strong><br />
+See below the list of authors with their most frequently used emoji. 8
+authors have never used an emoji.</p>
+<pre class="r"><code>library(tidyr)
+
+covfefe_chat%&gt;%
+  unnest(c(emoji,emoji_name))%&gt;%
+  filter(!is.na(author)&amp; emoji!=&quot;NULL&quot;)%&gt;%
+  group_by(author,emoji)%&gt;%
+  reframe(emoji,emoji_name,freq=n())%&gt;%
+  group_by(author) %&gt;%
+  arrange(desc(freq), .by_group = T) %&gt;%
+  distinct() %&gt;%
+  slice_head() %&gt;% select(author, emoji_name, freq) %&gt;%
+  print(n=23)</code></pre>
+<pre><code>## # A tibble: 23 × 3
+## # Groups:   author [23]
+##    author                emoji_name                         freq
+##    &lt;fct&gt;                 &lt;chr&gt;                             &lt;int&gt;
+##  1 Alessandro Colombi    waving hand: light skin tone          2
+##  2 Alessia Caponera      grinning face with smiling eyes       1
+##  3 Alice Giampino        beaming face with smiling eyes        2
+##  4 Andrea Gilardi        hot beverage                         18
+##  5 Caterina Daidone      partying face                         2
+##  6 Chiara Magnani        thumbs up: light skin tone            8
+##  7 Claudia Sartirana     face with tears of joy               11
+##  8 Federico Camerlenghi  grimacing face                        3
+##  9 Federico Cortese      coffin                                1
+## 10 Francesco Barile      raised hand                           1
+## 11 Giorgia Zaccaria      hot beverage                         11
+## 12 Jiefeng Bi            check mark button                     1
+## 13 Laura D&#39;Angelo        thumbs down                           1
+## 14 Luca Aiello           smiling face with smiling eyes        3
+## 15 Luca Danese           man raising hand: light skin tone     2
+## 16 Luca Presicce         hand with fingers splayed             4
+## 17 Ludovica De Carolis   smiling face with smiling eyes        9
+## 18 Muhammad Amir Saeed   thumbs up: light skin tone            5
+## 19 Nicola Crespi         smiling face with smiling eyes        1
+## 20 Riccardo Cogo         wrapped gift                          1
+## 21 Roberto Ascari        partying face                         6
+## 22 Tommaso Rigon         slightly smiling face                10
+## 23 Valentina Zangirolami smiling face with smiling eyes        5</code></pre>
 </div>
 
 
