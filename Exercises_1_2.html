@@ -360,7 +360,6 @@ Galkina, Muhammad Haroon Shaukat</h4>
 
 <div id="exercise-1---exploratory-data-analysis" class="section level2">
 <h2>Exercise 1 - Exploratory Data Analysis</h2>
-<pre><code>## Warning: package &#39;rwhatsapp&#39; was built under R version 4.2.3</code></pre>
 <p><strong>Who sent the highest number of messages?</strong><br />
 Andrea Gilardi sent the highest number of messages: 233.</p>
 <pre class="r"><code>covfefe_chat %&gt;%  count(author, sort = T) </code></pre>
@@ -397,7 +396,7 @@ The first message of the 2023 was sent by Andrea Gilardi at 15:08 on
 <pre><code>## # A tibble: 1 × 6
 ##   time                author         text                   source emoji emoji…¹
 ##   &lt;dttm&gt;              &lt;fct&gt;          &lt;chr&gt;                  &lt;chr&gt;  &lt;lis&gt; &lt;list&gt; 
-## 1 2023-01-04 15:08:29 Andrea Gilardi &quot;Hi everyone! First o… C:/! … &lt;chr&gt; &lt;chr&gt;  
+## 1 2023-01-04 15:08:11 Andrea Gilardi &quot;Hi everyone! First o… C:/! … &lt;chr&gt; &lt;chr&gt;  
 ## # … with abbreviated variable name ¹​emoji_name</code></pre>
 <p><strong>On which day did we exchange the highest number of messages?
 After filtering the corresponding text messages, check their content and
@@ -502,18 +501,17 @@ covfefe_chat%&gt;%
 <p><strong>Compute and display the total number of messages exchanged in
 the whatsapp chat after dividing the observations according to the hour
 of the day AND the day of the week</strong></p>
-<pre class="r"><code>library(lubridate)</code></pre>
-<pre><code>## Warning: package &#39;lubridate&#39; was built under R version 4.2.3</code></pre>
-<pre class="r"><code>df_plot&lt;-covfefe_chat%&gt;%
+<pre class="r"><code>library(lubridate)
+
+df_plot&lt;-covfefe_chat%&gt;%
   complete(time= seq.POSIXt(min(time), max(time), by=&quot;hour&quot;))%&gt;%
   group_by(Day=wday(time,label = T), Hour=hour(time))%&gt;%
     reframe(Freq_text=sum(table(text)))%&gt;%
   select(Day, Hour, Freq_text) 
 
 library(ggplot2)
-library(ggrepel)</code></pre>
-<pre><code>## Warning: package &#39;ggrepel&#39; was built under R version 4.2.3</code></pre>
-<pre class="r"><code>df_plot%&gt;%
+library(ggrepel)
+df_plot%&gt;%
 ggplot(aes(x= Hour, y=Freq_text))+
    geom_smooth(aes(color = Day),show.legend = T, stat=&quot;identity&quot;)+
    labs(x =&quot;Hour&quot; , y=&quot;Number of messages&quot; , title = &quot;Number of messages by hour and day&quot;)+

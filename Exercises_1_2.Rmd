@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Exercise 1 - Exploratory Data Analysis
 
-```{r echo=F, results='hide'}
+```{r echo=F, results='hide', message=FALSE, warning = FALSE}
 library(rwhatsapp)
 covfefe_chat <- rwa_read(
   here::here("exam", "covfefe_chat.txt"),
@@ -33,7 +33,7 @@ covfefe_chat %>%  count(author, sort = T)
 **How many messages were exchanged during December 2022?**  
 During December 2022 were exchanged 246 messages.  
 
-```{r}
+```{r warning = FALSE}
 covfefe_chat %>% 
   mutate(Month = lubridate::month(time, label = FALSE),
          Year = lubridate::year(time), DayMonth = format(as.Date(time), "%y-%m")) %>%
@@ -43,20 +43,20 @@ covfefe_chat %>%
 **Who sent the first message of the current year? At which time?**  
 The first message of the 2023 was sent by Andrea Gilardi at 15:08 on 2023-01-04.  
 
-```{r}
+```{r warning = FALSE}
 covfefe_chat %>% filter(time > '2022-12-31') %>%  slice(1) 
 ```
     
 **On which day did we exchange the highest number of messages? After filtering the corresponding text messages, check their content and try to explain the anomalous behaviour.**  
 The highest number of messages was exchanged on the 1st February 2023 (60 messages).
 
-```{r}
+```{r warning = FALSE}
 covfefe_chat %>% 
   mutate(YearMonthDay = format(as.Date(time), "%y-%m-%d")) %>% count(YearMonthDay, sort = T)
 ```
   
 Most of the messages of this day were exchanged to plan for an aperitif in the evening and a poll was created to count how many people were in. There were difficulties in finding a place where to have it.
-```{r}
+```{r warning = FALSE}
 covfefe_chat %>% 
   mutate(YearMonthDay = format(as.Date(time), "%y-%m-%d")) %>% 
   filter(YearMonthDay == "23-02-01") %>% select(text)
@@ -65,7 +65,7 @@ covfefe_chat %>%
 **How many messages are sent on average per day?**  
 15 messages are sent on average per day.  
 
-```{r}
+```{r warning = FALSE}
 covfefe_chat %>% 
   mutate(YearMonthDay = format(as.Date(time), "%y-%m-%d")) %>%
   count(YearMonthDay) %>% summarise(mean = mean(as.numeric(n))) %>% round()
@@ -74,7 +74,7 @@ covfefe_chat %>%
 **Who sent the highest number of messages which included at least one emoji?**  
 Andrea Gilardi sent the highest number of messages (66) which included at least one emoji.  
 
-```{r}
+```{r warning = FALSE}
 covfefe_chat %>% filter(!vapply(emoji, is.null, logical(1))) %>% count(author, sort = T)
 ```
 
@@ -82,7 +82,7 @@ covfefe_chat %>% filter(!vapply(emoji, is.null, logical(1))) %>% count(author, s
 **Determine the most common emoji for each author. In case of ties, you can select any of the equally-used emojies.**  
 See below the list of authors with their most frequently used emoji. 8 authors have never used an emoji.  
 
-```{r}
+```{r warning = FALSE}
 library(tidyr)
 
 covfefe_chat%>%
@@ -98,7 +98,7 @@ covfefe_chat%>%
   
 **Compute and display the total number of messages exchanged in the whatsapp chat after dividing the observations according to the hour of the day AND the day of the week**  
 
-```{r, results=F, message=FALSE}
+```{r, results=F, warning = FALSE, message = FALSE}
 library(lubridate)
 
 df_plot<-covfefe_chat%>%
